@@ -10,7 +10,7 @@ from io import StringIO
 from typing import List, Dict, Any
 from transformers import AutoModelForTokenClassification, AutoTokenizer, pipeline
 
-from load import ner_prediction
+from utils.load import ner_prediction
 
 def summarize_entities(dataframe: pd.DataFrame, entity_list=None) -> Dict[str, Dict[str, Any]]:
     """
