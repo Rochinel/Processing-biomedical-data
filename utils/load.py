@@ -86,4 +86,4 @@ def ner_prediction(pipe: pipeline, corpus: str) -> pd.DataFrame:
     df = pd.DataFrame(result)
 
     # Select and return specific columns
-    return df[['entity_group', 'word', 'score']]
+    return df[['entity_group', 'word', 'start',	'end' , 'score']]

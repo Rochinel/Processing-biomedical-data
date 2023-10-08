@@ -5,14 +5,15 @@ Created on fri sep 29/09/2023 00:18:35
 
 @author: Nanfa Rochinel
 """
-import pandas as pd
-from io import StringIO
 from typing import List, Dict, Any
-from transformers import AutoModelForTokenClassification, AutoTokenizer, pipeline
+
+import pandas as pd
+from transformers import pipeline
 
 from utils.load import ner_prediction
 
-def summarize_entities(dataframe: pd.DataFrame, entity_list=None) -> Dict[str, Dict[str, Any]]:
+
+def summarize_entities(dataframe: pd.DataFrame, entity_list: List[str] = None) -> Dict[str, Dict[str, Dict[str, Any]]]:
     """
     Summarize entity information from a DataFrame.
 
@@ -24,7 +25,7 @@ def summarize_entities(dataframe: pd.DataFrame, entity_list=None) -> Dict[str, D
     dataframe (pd.DataFrame): DataFrame containing entity data with columns 'entity_group', 'value', and 'score'.
 
     Returns:
-    Dict[str, Dict[str, Any]]: A dictionary summarizing entity information.
+    Dict[str, Dict[str, Dict[str, Any]]]: A dictionary summarizing entity information.
 
     Example:
     csv_data = '''
@@ -47,34 +48,32 @@ def summarize_entities(dataframe: pd.DataFrame, entity_list=None) -> Dict[str, D
 
     df = pd.read_csv(StringIO(csv_data))
     entities_to_summarize = ["Age", "Sex", "Sign_symptom", "Lab_value"]
-    result = summarize_entities(df, entities_to_summarize)
+    result = summarize_entities(entities_to_summarize, df)
     print(result)
     """
-    if entity_list is None:
-        entity_list = []
     entity_summary: Dict[str, Dict[str, Any]] = {}
 
-    if not entity_list:  # Vérifie si entity_list est vide
+    if not entity_list:  # check if entity_list is empty
         unique_entities = dataframe["entity_group"].unique()
         for entity_group in unique_entities:
-            entity_group_data = {}
-            entity_group_data["count"] = 0
-            entity_group_data["valeurs"] = {}
+            entity_group_data = {"count": 0, "values": {}}
 
             entity_df = dataframe[dataframe["entity_group"] == entity_group]
             unique_values = entity_df["word"].unique()
 
             for value in unique_values:
                 count = entity_df[entity_df["word"] == value].shape[0]
-                entity_group_data["valeurs"][value] = count
+                entity_group_data["values"][value] = {}
+                entity_group_data["values"][value]['count'] = count
+                entity_group_data["values"][value]["start"] = entity_df[entity_df["word"] == value]["start"].values[0]
+                entity_group_data["values"][value]["end"] = entity_df[entity_df["word"] == value]["end"].values[0]
+
                 entity_group_data["count"] += count
 
             entity_summary[entity_group] = entity_group_data
     else:
         for entity_group in entity_list:
-            entity_group_data: Dict[str, Any] = {}
-            entity_group_data["count"] = 0
-            entity_group_data["values"] = {}
+            entity_group_data: Dict[str, Any] = {"count": 0, "values": {}}
 
             # Filter the DataFrame to get only rows for the current entity group
             entity_df = dataframe[dataframe["entity_group"] == entity_group]
@@ -85,7 +84,11 @@ def summarize_entities(dataframe: pd.DataFrame, entity_list=None) -> Dict[str, D
             for value in unique_values:
                 # Count the occurrences of the word in the filtered DataFrame
                 count = entity_df[entity_df["word"] == value].shape[0]
-                entity_group_data["values"][value] = count
+                entity_group_data['values'][value] = {}
+                entity_group_data["values"][value]['count'] = count
+                # Add index on each value
+                entity_group_data["values"][value]["start"] = entity_df[entity_df["word"] == value]["start"].values[0]
+                entity_group_data["values"][value]["end"] = entity_df[entity_df["word"] == value]["end"].values[0]
 
                 # Update the total count for the entity group
                 entity_group_data["count"] += count
@@ -94,6 +97,7 @@ def summarize_entities(dataframe: pd.DataFrame, entity_list=None) -> Dict[str, D
             entity_summary[entity_group] = entity_group_data
 
     return entity_summary
+
 
 def corpus_analyzer(pipe: pipeline, corpus: str, entities: List[str] = None, compute: str = "no-gpu") -> Dict:
     """
@@ -135,6 +139,3 @@ def corpus_analyzer(pipe: pipeline, corpus: str, entities: List[str] = None, com
     summary = summarize_entities(entity_list=entities, dataframe=pred_df)
 
     return summary
-
-
-
