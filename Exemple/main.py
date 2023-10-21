@@ -1,3 +1,5 @@
+from typing import List
+
 import pandas as pd
 from transformers import pipeline
 from transformers import AutoTokenizer, AutoModelForTokenClassification
@@ -17,8 +19,10 @@ def main():
             "She denied preceding symptoms of chest discomfort, palpitations, syncope or infection. "
             "The patient was afebrile and normotensive, with a sinus tachycardia of 140 beats/min, corona, malaria")
 
+
+
     # list of entities we want to detecte
-    entities = ["Age", "Sex", "Sign_symptom", "Lab_value", "Disease_disorder"]
+    entities: list[str] = ["Age", "Sex", "Sign_symptom", "Lab_value", "Disease_disorder"]
 
     # load model and tokenizer
     tokenizer = AutoTokenizer.from_pretrained("d4data/biomedical-ner-all")
@@ -28,7 +32,7 @@ def main():
     pipe = load_model(model=model, tokenizer=tokenizer)
 
     # lets analyse our corpus now
-    summary = corpus_analyzer(pipe=pipe, corpus=data, entities=entities)
+    summary = corpus_analyzer(pipe=pipe, corpus=data)
 
     print('Corpus_Analyser: ', summary)
 
