@@ -25,6 +25,12 @@ The `utils` package is the core of this repository and contains the following mo
      - `summarize_entities`: Summarize the detected entities from the NER predictions.
    - **Dependencies**: This module leverages pandas, transformers, and typing among others.
 
+### 2. **co_occurence_matrix.py**
+   - **Functions**:
+     - `cooccurrence_analysis`: Analyze the corpus using the summarize _entities output and corpus to give the cooccurence matrice between the detected entities.
+     - `plot_cooccurrence_matrix`: show the cooccurence matrix using the matplotlib librairy.
+   - **Dependencies**: This module leverages numpy, re, scikit-learn, and typing among others.
+
 ## Usage:
 
 To use the utilities provided in this repository, you can refer to the scripts in the `Exemple` directory which demonstrate how to load models, perform NER predictions, and analyze the results.

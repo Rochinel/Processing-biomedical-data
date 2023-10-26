@@ -7,6 +7,7 @@ from transformers import AutoTokenizer, AutoModelForTokenClassification
 
 from utils.load import load_model
 from utils.process_data import corpus_analyzer
+from utils.co_occurence_matrix import cooccurrence_analysis, plot_cooccurrence_matrix
 
 
 
@@ -46,6 +47,14 @@ def main():
     print('Corpus_Analyser_1: ', summary)
     print('corpus_Analyse_2: ', summary_2)
 
+
+    # Generate Co_corrunce matrix for data.
+
+    matrix, entities = cooccurrence_analysis(data, summary, window_size=30, threshold=0.05)
+
+    # plot the matrix
+
+    plot_cooccurrence_matrix(matrix, entities)
 
 
 if __name__ == "__main__":
